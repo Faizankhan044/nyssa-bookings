@@ -1,4 +1,4 @@
-const CACHE = "nyssa-bookings-v4";
+const CACHE = "nyssa-bookings-v5";
 const FILES = [
   "./nbs_booking_form.html",
   "./manifest.json",

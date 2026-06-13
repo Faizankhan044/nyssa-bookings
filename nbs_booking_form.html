@@ -313,11 +313,6 @@ main{padding:14px 16px 100px;}
       <div class="card-hdr c-purple"><div class="card-hdr-icon">👥</div><div><div class="card-hdr-title">Group &amp; Client Details</div><div class="card-hdr-sub">Group info &amp; one card per passenger</div></div></div>
       <div class="card-body">
         <div class="field"><label>Group Name</label><input type="text" id="b-groupName" placeholder="e.g. Smith Family, Leopard Tours Group"/></div>
-        <div class="r3">
-          <div class="field"><label>Adult Pax</label><input type="number" id="b-grpAdults" min="0" value="1" oninput="bCalcGrpPax()"/></div>
-          <div class="field"><label>Children Pax</label><input type="number" id="b-grpChildren" min="0" value="0" oninput="bCalcGrpPax()"/></div>
-          <div class="field"><label>Total Pax</label><input type="number" id="b-grpTotal" readonly/></div>
-        </div>
         <div id="b-clientsWrap"></div>
         <button class="btn-add" onclick="addClient('b-clientsWrap','b')">+ Add another client</button>
         <div class="nav-btns">
@@ -508,24 +503,7 @@ function v(id){ return (document.getElementById(id)||{}).value||""; }
 function pickChip(el){ var ch=el.parentElement.querySelectorAll(".chip"); for(var i=0;i<ch.length;i++)ch[i].classList.remove("on"); el.classList.add("on"); }
 function chipVal(gid){ var s=document.querySelector("#"+gid+" .chip.on"); return s?s.textContent.trim():"—"; }
 
-// ── screens ───────────────────────────────────────────────────────────────
-function goHome(){
-  document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("show");});
-  document.getElementById("screen-dashboard").classList.add("show");
-  window.scrollTo({top:0,behavior:"smooth"});
-}
-function openBooking(){
-  document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("show");});
-  document.getElementById("screen-booking").classList.add("show");
-  bInit();
-  window.scrollTo({top:0,behavior:"smooth"});
-}
-function openBriefing(){
-  document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("show");});
-  document.getElementById("screen-briefing").classList.add("show");
-  brInit();
-  window.scrollTo({top:0,behavior:"smooth"});
-}
+// ── screens — defined in back button block below ─────────────────────────
 
 // ── shared POP handler ────────────────────────────────────────────────────
 var popObjectURL = null;
@@ -581,7 +559,7 @@ function addClient(wrapId, prefix){
   div.className="client-card";
   div.id=prefix+"-clientCard"+n;
   div.setAttribute("data-id",n);
-  var removeBtn=n>1?'<button class="btn-remove" onclick="removeClient(\'"+prefix+"-clientCard"+n+"\')">✕ Remove</button>':""
+  var removeBtn=n>1?'<button class="btn-remove" onclick="removeClient(this)">✕ Remove</button>':""  
   div.innerHTML='<div class="client-card-hdr"><div class="client-card-title">👤 Client '+n+'</div>'+removeBtn+'</div>'
     +'<div class="r2"><div class="field"><label>Full Name</label><input type="text" id="'+prefix+'-cName'+n+'" placeholder="First Last" oninput="'+prefix+'RefreshSummary()"/></div>'
     +'<div class="field"><label>Age</label><input type="number" id="'+prefix+'-cAge'+n+'" min="1" max="120" placeholder="e.g. 35"/></div></div>'
@@ -595,7 +573,7 @@ function addClient(wrapId, prefix){
     +'<div class="field"><label>Medical Condition</label><input type="text" id="'+prefix+'-cMedical'+n+'" placeholder="e.g. None, Diabetes, Fear of heights"/></div>';
   document.getElementById(wrapId).appendChild(div);
 }
-function removeClient(cardId){ var el=document.getElementById(cardId); if(el)el.remove(); }
+function removeClient(btn){ var card=btn.closest(".client-card"); if(card)card.remove(); }
 
 function collectClients(prefix){
   var cards=document.querySelectorAll('[id^="'+prefix+'-clientCard"]');
@@ -622,8 +600,6 @@ function collectClients(prefix){
     lines+="   Dietary          : "+diet+"\n";
     var medical=v(prefix+"-cMedical"+id)||"None";
     lines+="   Medical Condition: "+medical+"\n";
-    var medical=v(prefix+"-cMedical"+id)||"None";
-    lines+="   Medical Condition : "+medical+"\n";
   }
   return {lines:lines, firstName:firstName};
 }
@@ -650,10 +626,10 @@ function bInit(){
   document.getElementById("b-responseNo").value=ref;
   document.getElementById("b-refBadge").textContent="#"+ref;
   document.getElementById("b-clientsWrap").innerHTML="";
-  document.getElementById("b-groupName").value="";
-  document.getElementById("b-grpAdults").value=1;
-  document.getElementById("b-grpChildren").value=0;
-  document.getElementById("b-grpTotal").value=1;
+  if(document.getElementById("b-groupName"))document.getElementById("b-groupName").value="";
+  if(document.getElementById("b-grpAdults"))document.getElementById("b-grpAdults").value=1;
+  if(document.getElementById("b-grpChildren"))document.getElementById("b-grpChildren").value=0;
+  if(document.getElementById("b-grpTotal"))document.getElementById("b-grpTotal").value=1;
   clientCounts.b=0;
   addClient("b-clientsWrap","b");
   bCurrentStep=1;
@@ -782,23 +758,9 @@ function bGenerateReport(){
   msg+="   Briefed By      : "+(v("b-briefedBy")||"—")+"\n";
   msg+="   Driver Number   : "+(v("b-driverNumber")||"—")+"\n";
   msg+="   Driver Comm.    : TZS "+fmtNum(v("b-driverComm"))+"\n";
-  var bGrpName=v("b-groupName");
-  var bGrpA=parseInt(v("b-grpAdults"))||0;
-  var bGrpC=parseInt(v("b-grpChildren"))||0;
-  msg+="\n👥 GROUP INFO\n";
-  if(bGrpName)msg+="   Group Name      : "+bGrpName+"\n";
-  msg+="   Adult Pax       : "+bGrpA+"\n";
-  msg+="   Children Pax    : "+bGrpC+"\n";
-  msg+="   Total Pax       : "+(bGrpA+bGrpC)+"\n";
   var bGroupName=v("b-groupName");
-  var bClAdults=parseInt(v("b-grpAdults"))||0;
-  var bClChildren=parseInt(v("b-grpChildren"))||0;
-  var bClTotal=bClAdults+bClChildren;
   msg+="\n👤 CLIENT DETAILS\n";
   if(bGroupName)msg+="   Group Name      : "+bGroupName+"\n";
-  msg+="   Adult Pax       : "+bClAdults+"\n";
-  msg+="   Children Pax    : "+bClChildren+"\n";
-  msg+="   Total Pax       : "+bClTotal+"\n";
   msg+=clients.lines;
   msg+="\n💼 SALES\n";
   msg+="   Sales Person    : "+(v("b-salesPerson")||"—")+"\n";
@@ -905,12 +867,6 @@ function brGenerateReport(){
   var brClAdults=parseInt(v("br-grpAdults"))||0;
   var brClChildren=parseInt(v("br-grpChildren"))||0;
   var brClTotal=brClAdults+brClChildren;
-  msg+="\n👤 CLIENT DETAILS\n";
-  if(brGroupName)msg+="   Group Name      : "+brGroupName+"\n";
-  msg+="   Adult Pax       : "+brClAdults+"\n";
-  msg+="   Children Pax    : "+brClChildren+"\n";
-  msg+="   Total Pax       : "+brClTotal+"\n";
-  msg+=clients.lines;
   msg+="\n🗺️ LOGISTICS\n";
   msg+="   Flight Location  : "+loc+"\n";
   msg+="   Pickup Date      : "+fmtDate(v("br-pickupDate"))+"\n";
@@ -936,8 +892,14 @@ if("serviceWorker" in navigator){
 }
 
 // ── Back button intercept ─────────────────────────────────────────────────
-// Push a state on load so the back button hits popstate first, not exit
-history.pushState({page:"home"}, "", "");
+// Keep pushing states continuously so there is always something to pop
+function pushAppState() {
+  history.pushState({page:"app"}, "", "");
+}
+
+// Push two states immediately — one acts as the "floor" catch
+history.pushState({page:"app"}, "", "");
+history.pushState({page:"app"}, "", "");
 
 window.addEventListener("popstate", function(e) {
   var booking  = document.getElementById("screen-booking");
@@ -945,39 +907,62 @@ window.addEventListener("popstate", function(e) {
   var dash     = document.getElementById("screen-dashboard");
 
   if (booking.classList.contains("show")) {
-    // On booking screen - go back a step or to dashboard
     if (bCurrentStep > 1) {
       bGoStep(bCurrentStep - 1);
     } else {
       goHome();
     }
-    history.pushState({page:"app"}, "", "");
+    // Always re-push so there is always a state to catch next back press
+    pushAppState();
     return;
   }
 
   if (briefing.classList.contains("show")) {
-    // On briefing screen - go back a step or to dashboard
     if (brCurrentStep > 1) {
       brGoStep(brCurrentStep - 1);
     } else {
       goHome();
     }
-    history.pushState({page:"app"}, "", "");
+    pushAppState();
     return;
   }
 
   if (dash.classList.contains("show")) {
-    // On dashboard - confirm before exit
     var confirmExit = confirm("Exit Nyssa Bookings?");
     if (!confirmExit) {
-      history.pushState({page:"home"}, "", "");
+      // User wants to stay — re-push so next back also prompts
+      pushAppState();
     }
+    // If yes — allow natural exit by not pushing
     return;
   }
 
-  // Default - stay in app
-  history.pushState({page:"app"}, "", "");
+  // Fallback — never let it exit silently
+  pushAppState();
 });
+
+// Also re-push a state every time we navigate within the app
+// so the history stack never runs dry
+function goHome() {
+  document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("show");});
+  document.getElementById("screen-dashboard").classList.add("show");
+  window.scrollTo({top:0,behavior:"smooth"});
+  pushAppState();
+}
+function openBooking() {
+  document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("show");});
+  document.getElementById("screen-booking").classList.add("show");
+  bInit();
+  window.scrollTo({top:0,behavior:"smooth"});
+  pushAppState();
+}
+function openBriefing() {
+  document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("show");});
+  document.getElementById("screen-briefing").classList.add("show");
+  brInit();
+  window.scrollTo({top:0,behavior:"smooth"});
+  pushAppState();
+}
 </script>
 <!-- dev:fk -->
 <meta name="author" content="Faizan Khan"/>
