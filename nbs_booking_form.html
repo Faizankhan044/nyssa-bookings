@@ -934,6 +934,50 @@ function brNewForm(){ brInit(); window.scrollTo({top:0,behavior:"smooth"}); }
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});
 }
+
+// ── Back button intercept ─────────────────────────────────────────────────
+// Push a state on load so the back button hits popstate first, not exit
+history.pushState({page:"home"}, "", "");
+
+window.addEventListener("popstate", function(e) {
+  var booking  = document.getElementById("screen-booking");
+  var briefing = document.getElementById("screen-briefing");
+  var dash     = document.getElementById("screen-dashboard");
+
+  if (booking.classList.contains("show")) {
+    // On booking screen - go back a step or to dashboard
+    if (bCurrentStep > 1) {
+      bGoStep(bCurrentStep - 1);
+    } else {
+      goHome();
+    }
+    history.pushState({page:"app"}, "", "");
+    return;
+  }
+
+  if (briefing.classList.contains("show")) {
+    // On briefing screen - go back a step or to dashboard
+    if (brCurrentStep > 1) {
+      brGoStep(brCurrentStep - 1);
+    } else {
+      goHome();
+    }
+    history.pushState({page:"app"}, "", "");
+    return;
+  }
+
+  if (dash.classList.contains("show")) {
+    // On dashboard - confirm before exit
+    var confirmExit = confirm("Exit Nyssa Bookings?");
+    if (!confirmExit) {
+      history.pushState({page:"home"}, "", "");
+    }
+    return;
+  }
+
+  // Default - stay in app
+  history.pushState({page:"app"}, "", "");
+});
 </script>
 <!-- dev:fk -->
 <meta name="author" content="Faizan Khan"/>
