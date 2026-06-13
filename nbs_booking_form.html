@@ -867,6 +867,9 @@ function brGenerateReport(){
   var brClAdults=parseInt(v("br-grpAdults"))||0;
   var brClChildren=parseInt(v("br-grpChildren"))||0;
   var brClTotal=brClAdults+brClChildren;
+  msg+="\n👤 CLIENT DETAILS\n";
+  if(brGroupName)msg+="   Group Name      : "+brGroupName+"\n";
+  msg+=clients.lines;
   msg+="\n🗺️ LOGISTICS\n";
   msg+="   Flight Location  : "+loc+"\n";
   msg+="   Pickup Date      : "+fmtDate(v("br-pickupDate"))+"\n";
