@@ -1,7 +1,7 @@
 {
   "name": "Nyssa Bookings",
   "short_name": "Nyssa Bookings",
-  "description": "NBS Booking Form — Nyssa Tourism Holdings Tanzania",
+  "description": "NBS Booking & Briefing Form — Nyssa Tourism Holdings Tanzania",
   "start_url": "./nbs_booking_form.html",
   "display": "standalone",
   "background_color": "#1B6CA8",
