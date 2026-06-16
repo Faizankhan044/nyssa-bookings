@@ -620,18 +620,53 @@ function brCalcGroupPax(){
 }
 function bInit(){
   var today=new Date().toISOString().split("T")[0];
+  var el;
+  // Dates
   document.getElementById("b-bookingDate").value=today;
   document.getElementById("b-paymentDate").value=today;
+  document.getElementById("b-flightDate").value="";
+  // Ref number
   var ref=genRef();
   document.getElementById("b-responseNo").value=ref;
   document.getElementById("b-refBadge").textContent="#"+ref;
+  // Step 1 fields
+  document.getElementById("b-proformaNo").value="";
+  document.getElementById("b-adults").value=1;
+  document.getElementById("b-children").value=0;
+  document.getElementById("b-totalPax").value=1;
+  document.getElementById("b-rateAdult").value="";
+  document.getElementById("b-rateChild").value="";
+  document.getElementById("b-foc").value=0;
+  document.getElementById("b-discount").value=0;
+  document.getElementById("b-totalAmtDisplay").textContent="USD 0";
+  // Step 2 fields
+  document.getElementById("b-amountPaid").value="";
+  document.getElementById("b-paymentMode").selectedIndex=0;
+  document.getElementById("b-popFile").value="";
+  document.getElementById("b-popPreview").style.display="none";
+  // Step 3 fields
+  document.getElementById("b-pickupLocation").value="";
+  document.getElementById("b-pickupTime").value="";
+  document.getElementById("b-briefedBy").value="";
+  document.getElementById("b-driverNumber").value="";
+  document.getElementById("b-driverComm").value="";
+  // Step 5 fields
+  document.getElementById("b-salesPerson").value="";
+  document.getElementById("b-middleComm").value="";
+  document.getElementById("b-tourAgent").value="";
+  document.getElementById("b-comments").value="";
+  // Reset all chip groups to first chip
+  ["b-g-bookingType","b-g-payment","b-g-launch","b-g-briefed"].forEach(function(gid){
+    var chips=document.querySelectorAll("#"+gid+" .chip");
+    chips.forEach(function(c){c.classList.remove("on");});
+    if(chips.length>0)chips[0].classList.add("on");
+  });
+  // Clients section
   document.getElementById("b-clientsWrap").innerHTML="";
-  if(document.getElementById("b-groupName"))document.getElementById("b-groupName").value="";
-  if(document.getElementById("b-grpAdults"))document.getElementById("b-grpAdults").value=1;
-  if(document.getElementById("b-grpChildren"))document.getElementById("b-grpChildren").value=0;
-  if(document.getElementById("b-grpTotal"))document.getElementById("b-grpTotal").value=1;
+  el=document.getElementById("b-groupName"); if(el)el.value="";
   clientCounts.b=0;
   addClient("b-clientsWrap","b");
+  // Step navigation
   bCurrentStep=1;
   for(var i=1;i<=5;i++){
     document.getElementById("b-step"+i).classList.remove("show");
@@ -640,6 +675,7 @@ function bInit(){
   document.getElementById("b-step1").classList.add("show");
   document.getElementById("b-pill1").classList.add("active");
   document.getElementById("b-outWrap").style.display="none";
+  document.getElementById("b-liveSummary").textContent="—";
   bCalcAll();
   bUpdateProgress();
 }
@@ -785,13 +821,33 @@ function bNewForm(){ bInit(); window.scrollTo({top:0,behavior:"smooth"}); }
 var brCurrentStep=1;
 function brInit(){
   var today=new Date().toISOString().split("T")[0];
-  document.getElementById("br-briefingDate").value=today;
-  document.getElementById("br-pickupDate").value=today;
   var now=new Date();
+  // Dates & times
+  document.getElementById("br-briefingDate").value=today;
   document.getElementById("br-briefingTime").value=pad(now.getHours())+":"+pad(now.getMinutes());
+  document.getElementById("br-pickupDate").value=today;
+  document.getElementById("br-pickupTime").value="";
+  document.getElementById("br-flightDate").value="";
+  // Ref
   var ref=genRef();
   document.getElementById("br-responseNo").value=ref;
   document.getElementById("br-refBadge").textContent="#"+ref;
+  // Briefing step fields
+  document.getElementById("br-tourAgent").value="";
+  document.getElementById("br-notes").value="";
+  // Logistics fields
+  document.getElementById("br-driverName").value="";
+  document.getElementById("br-agentDriverName").value="";
+  document.getElementById("br-agentDriverNumber").value="";
+  document.getElementById("br-salesRep").value="";
+  // Reset chips to first option
+  var chipGroups=["br-g-bookingType","br-g-ticket","br-g-paid","br-g-location"];
+  chipGroups.forEach(function(gid){
+    var chips=document.querySelectorAll("#"+gid+" .chip");
+    chips.forEach(function(c){c.classList.remove("on");});
+    if(chips.length>0)chips[0].classList.add("on");
+  });
+  // Clients
   document.getElementById("br-clientsWrap").innerHTML="";
   document.getElementById("br-groupName").value="";
   document.getElementById("br-grpAdults").value=1;
@@ -799,6 +855,7 @@ function brInit(){
   document.getElementById("br-grpTotal").value=1;
   clientCounts.br=0;
   addClient("br-clientsWrap","br");
+  // Steps
   brCurrentStep=1;
   for(var i=1;i<=3;i++){
     document.getElementById("br-step"+i).classList.remove("show");
@@ -807,6 +864,7 @@ function brInit(){
   document.getElementById("br-step1").classList.add("show");
   document.getElementById("br-pill1").classList.add("active","teal");
   document.getElementById("br-outWrap").style.display="none";
+  document.getElementById("br-liveSummary").textContent="—";
   brUpdateProgress();
 }
 function brUpdateProgress(){
