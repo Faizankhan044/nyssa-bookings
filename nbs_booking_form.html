@@ -205,6 +205,14 @@ main{padding:14px 16px 100px;}
 .pf-bank-grid div div{margin-bottom:3px;}
 .pf-pagefoot{text-align:right;font-size:10px;color:#999;margin-top:30px;border-top:1px solid #eee;padding-top:10px;}
 
+/* ── Proforma mobile-only layout fix (does not affect desktop or other sections) ── */
+@media (max-width: 480px) {
+  #screen-proforma .r3{grid-template-columns:1fr;gap:10px;}
+  #screen-proforma .line-row{grid-template-columns:1fr 1fr;row-gap:8px;column-gap:8px;align-items:start;}
+  #screen-proforma .line-row > div:nth-child(1){grid-column:1/-1;}
+  #screen-proforma .line-row .btn-remove-row{grid-column:1/-1;width:100%;padding:8px;}
+}
+
 
 </style>
 </head>
@@ -652,7 +660,7 @@ main{padding:14px 16px 100px;}
 
       <div class="totals-box">
         <div class="totals-row"><span>Subtotal</span><span id="subtotalDisplay">$0.00</span></div>
-        <div class="field" style="margin-top:8px;margin-bottom:4px;"><label>Other (+ addition / − discount)</label><input type="number" id="otherAmount" value="0" step="0.01" oninput="calcTotals()"/></div>
+        <div class="field" style="margin-top:8px;margin-bottom:4px;"><label>Other (+ addition / − discount)</label><input type="text" inputmode="decimal" id="otherAmount" value="0" oninput="calcTotals()"/></div>
         <div class="totals-row grand"><span>TOTAL</span><span id="totalDisplay">$0.00</span></div>
       </div>
     </div>
